@@ -1,3 +1,4 @@
+
 # Faraday::ManualCache
 
 A super simple Faraday cache implementation.
