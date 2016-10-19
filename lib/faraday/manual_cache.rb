@@ -19,11 +19,12 @@ module Faraday
     def initialize(app, *args)
       super(app)
       options = args.first || {}
-      @expires_in    = options.fetch(:expires_in, 30)
-      @logger        = options.fetch(:logger, nil)
-      @namespace     = options.fetch(:namespace, 'faraday-manual-cache')
-      @store         = options.fetch(:store, :memory_store)
-      @store_options = options.fetch(:store_options, {})
+      @expires_in             = options.fetch(:expires_in, 30)
+      @logger                 = options.fetch(:logger, nil)
+      @namespace              = options.fetch(:namespace, 'faraday-manual-cache')
+      @store                  = options.fetch(:store, :memory_store)
+      @store_options          = options.fetch(:store_options, {})
+      @ignore_http_statuses   = options.fetch(:ignore_http_statuses, [])
 
       @store_options[:namespace] ||= @namespace
 
@@ -41,7 +42,7 @@ module Faraday
 
       if response_env
         response_env.response_headers['x-faraday-manual-cache'] = 'HIT'
-        to_response(cached_response(env)) 
+        to_response(cached_response(env))
       else
         @app.call(env).on_complete do |response_env|
           response_env.response_headers['x-faraday-manual-cache'] = 'MISS'
@@ -58,7 +59,15 @@ module Faraday
     end
 
     def cacheable?(env)
-      env.method == :get || env.method == :head
+      valid_http_method?(env.method) && valid_http_status?(env.status)
+    end
+
+    def valid_http_method?(method)
+      method == :get || method == :head
+    end
+
+    def valid_http_status?(status)
+      !@ignore_http_statuses.include?(status)
     end
 
     def cached_response(env)
