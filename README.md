@@ -1,6 +1,9 @@
 
 # Faraday::ManualCache
 
+## NOTE
+This Fork has been deprecated since https://github.com/dobs/faraday-manual-cache/pull/2/files was merged into the main repo. Handybook master switched off of this fork with https://github.com/Handybook/handybook/pull/17516.
+
 A super simple Faraday cache implementation.
 
 Unlike [`faraday-http-cache`](https://github.com/plataformatec/faraday-http-cache), `faraday-manual-cache` ignores cache headers in favor of a manually-specified `expires_in`.
